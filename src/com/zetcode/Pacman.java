@@ -5,14 +5,17 @@ import javax.swing.JFrame;
 
 public class Pacman extends JFrame {
 
+    private Board board;
+    private Agent agent;
     public Pacman() {
-
+        board= new Board();
         initUI();
+        agent=new PacmanAgent(new Pair(0,0,null),board);
     }
 
     private void initUI() {
 
-        add(new Board());
+        add(board);
 
         setTitle("Pacman");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -26,6 +29,7 @@ public class Pacman extends JFrame {
 
             Pacman ex = new Pacman();
             ex.setVisible(true);
+            ex.agent.startAgent();
         });
     }
 }
