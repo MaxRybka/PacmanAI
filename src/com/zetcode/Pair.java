@@ -35,9 +35,23 @@ class Pair {
         this.parent = parent;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        // If the object is compared with itself then return true
+        if (obj == this) {
+            return true;
+        }
 
-    public boolean equals(Pair obj) {
-        return this.x == obj.x && this.y == obj.y;
+        /* Check if o is an instance of Pair or not
+          "null instanceof [type]" also returns false */
+        if (!(obj instanceof Pair)) {
+            return false;
+        }
+
+        // typecast o to Complex so that we can compare data members
+        Pair pair = (Pair) obj;
+
+        return this.x == pair.x && this.y == pair.y;
     }
 
     @Override

@@ -27,6 +27,8 @@ public class PacmanAgent implements Agent {
             frontier.addAll(successor(pair));
             if (frontier.isEmpty())return null;
         }
+        System.out.println("Frontier size : " + frontier.size()
+        + "\nVisited size : " + visited.size());
         return findBackPath(frontier.peek());
     }
 
