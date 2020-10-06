@@ -367,6 +367,10 @@ public class Board extends JPanel implements ActionListener {
 
                 pacmand_x = c_path.peek().getX() - x;
                 pacmand_y = c_path.peek().getY() - y;
+
+                //change pacman view
+                view_dx = pacmand_x;
+                view_dy = pacmand_y;
             }
         }
 
