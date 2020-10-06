@@ -10,7 +10,7 @@ public class Pacman extends JFrame {
     public Pacman() {
         board= new Board();
         initUI();
-        agent=new PacmanAgent(new Pair(0,0,null),board);
+        agent=new PacmanAgent(new Pair(9,17,null),board);
     }
 
     private void initUI() {
@@ -19,7 +19,7 @@ public class Pacman extends JFrame {
 
         setTitle("Pacman");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(380, 420);
+        setSize(471, 532);
         setLocationRelativeTo(null);
     }
 
