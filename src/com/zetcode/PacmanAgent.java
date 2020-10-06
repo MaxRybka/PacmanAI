@@ -1,9 +1,6 @@
 package com.zetcode;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.*;
 
 public class PacmanAgent implements Agent {
     private ArrayDeque<Pair> frontier = new ArrayDeque<>();
@@ -20,8 +17,8 @@ public class PacmanAgent implements Agent {
         frontier.add(start_pair);
     }
 
-@Override
-    public ArrayList<Pair> startAgent(){
+    @Override
+    public Stack<Pair> startAgent(){
         startCalcTime = System.currentTimeMillis();
         while(!found(frontier.peek())){
             Pair pair=frontier.remove();
@@ -33,8 +30,8 @@ public class PacmanAgent implements Agent {
         return findBackPath(frontier.peek());
     }
 
-    private ArrayList<Pair> findBackPath(Pair pair){
-        ArrayList<Pair> result = new ArrayList<>();
+    private Stack<Pair> findBackPath(Pair pair){
+        Stack<Pair> result = new Stack<>();
         result.add(pair);
         Pair currPair = pair;
         System.out.println(currPair.toString());

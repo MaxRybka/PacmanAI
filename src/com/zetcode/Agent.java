@@ -1,9 +1,10 @@
 package com.zetcode;
 
 import java.util.ArrayList;
+import java.util.Stack;
 
 interface Agent {
-    ArrayList<Pair> startAgent();
+    Stack<Pair> startAgent();
     ArrayList<Pair>successor(Pair pos);
     boolean found(Pair pos);
 }

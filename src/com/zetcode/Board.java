@@ -14,6 +14,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.Stack;
 
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
@@ -58,6 +60,9 @@ public class Board extends JPanel implements ActionListener {
     private int pacman_x, pacman_y, pacmand_x, pacmand_y;
     private int req_dx, req_dy, view_dx, view_dy;
 
+    private Stack<Pair> pacmanPath;
+    private Stack<Pair> c_path;
+
     //0 - пусто без | без *
     //1 - | слева без *
     //8 - без * снизу |
@@ -74,8 +79,8 @@ public class Board extends JPanel implements ActionListener {
              5,  0,  0,  0,  5,  0,  5,  0,  0,  0,  0,  0,  5,  0,  5,  0,  0,  0,  5,
              5,  0,  0,  0,  5,  0,  5,  0,  0,  0,  0,  0,  5,  0,  5,  0,  0,  0,  5,
              9, 10, 10, 10,  4,  0,  9, 10,  6,  0,  3, 10, 12,  0,  1, 10, 10, 10, 12,
-             0,  0,  0,  0, 21,  0,  0,  0,  5,  0,  5,  0,  0,  0,  5,  0,  0,  0,  0,
-             0,  0,  0,  0,  5,  0,  3, 10,  8, 10,  8, 10,  6,  0,  5,  0,  0,  0,  0,
+             0,  0,  0,  0,  5,  0,  0,  0,  5,  0,  5,  0,  0,  0,  5,  0,  0,  0,  0,
+             0,  0,  0,  0,  5,  0,  3, 10,  8, 26,  8, 10,  6,  0,  5,  0,  0,  0,  0,
              0,  0,  0,  0,  5,  0,  5,  0,  0,  0,  0,  0,  5,  0,  5,  0,  0,  0,  0,
             11, 10, 10, 10,  0, 10,  4,  0,  0,  0,  0,  0,  1, 10,  0, 10, 10, 10, 14,
              0,  0,  0,  0,  5,  0,  5,  0,  0,  0,  0,  0,  5,  0,  5,  0,  0,  0,  0,
@@ -131,6 +136,10 @@ public class Board extends JPanel implements ActionListener {
         this.calcTime = calcTime;
     }
 
+    public void SetPacmanPath(Stack<Pair> pacmanPath){
+        this.pacmanPath = pacmanPath;
+    }
+
 
     @Override
     public void addNotify() {
@@ -161,7 +170,8 @@ public class Board extends JPanel implements ActionListener {
 //
 //        } else {
 
-            movePacman();
+            //movePacman();
+            movePacmanOnPath();
             drawPacman(g2d);
             //moveGhosts(g2d);
             //checkMaze();
@@ -325,6 +335,45 @@ public class Board extends JPanel implements ActionListener {
         return screenData[ pair.getX()+ N_BLOCKS * (int) pair.getY()];
     }
 
+    private void movePacmanOnPath() {
+
+        if(c_path.isEmpty()){
+
+            //end program
+            return;
+        }
+
+        if(pacman_x % BLOCK_SIZE ==0 && pacman_y % BLOCK_SIZE ==0) {
+            int x = pacman_x / BLOCK_SIZE;
+            int y = pacman_y / BLOCK_SIZE;
+            int pos = x + N_BLOCKS * (int) y;
+
+            if (x == c_path.peek().getX() && y == c_path.peek().getY()) {
+
+                //mark this cell as visited
+
+                screenData[pos] = (short) (screenData[pos] + 16);
+
+                System.out.println("Pacman is on " + c_path.peek().toString() + "\nit's value : " + screenData[pos]);
+
+
+                c_path.pop();
+
+                if(c_path.isEmpty()){
+
+                    //end program
+                    return;
+                }
+
+                pacmand_x = c_path.peek().getX() - x;
+                pacmand_y = c_path.peek().getY() - y;
+            }
+        }
+
+        pacman_x = pacman_x + PACMAN_SPEED * pacmand_x;
+        pacman_y = pacman_y + PACMAN_SPEED * pacmand_y;
+    }
+
     private void movePacman() {
 
         int pos;
@@ -343,7 +392,7 @@ public class Board extends JPanel implements ActionListener {
 
             //проверяет сьел ли конфетку и обнуляет значение
             if ((ch & 16) != 0) {
-                screenData[pos] = (short) (ch & 15);
+                screenData [pos] = (short) (ch & 15);
                 score++;
             }
 
@@ -504,6 +553,8 @@ public class Board extends JPanel implements ActionListener {
         initLevel();
         //N_GHOSTS = 6;
         currentSpeed = 3;
+
+        this.c_path = pacmanPath;
     }
 
     private void initLevel() {

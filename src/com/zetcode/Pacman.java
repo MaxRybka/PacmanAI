@@ -29,7 +29,7 @@ public class Pacman extends JFrame {
 
             Pacman ex = new Pacman();
             ex.setVisible(true);
-            ex.agent.startAgent();
+            ex.board.SetPacmanPath(ex.agent.startAgent());
         });
     }
 }
