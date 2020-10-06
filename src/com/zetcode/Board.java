@@ -51,6 +51,8 @@ public class Board extends JPanel implements ActionListener {
 
     //Stats
     private long calcTime;
+    private int moves;
+    private int operMem;
 
     //private Image ghost;
     private Image pacman1, pacman2up, pacman2left, pacman2right, pacman2down;
@@ -135,6 +137,12 @@ public class Board extends JPanel implements ActionListener {
     public void SetCalcTime(long calcTime){
         this.calcTime = calcTime;
     }
+    public void SetMoves(int moves){
+        this.moves = moves;
+    }
+    public void SetOperMem(int operMem){
+        this.operMem = operMem;
+    }
 
     public void SetPacmanPath(Stack<Pair> pacmanPath){
         this.pacmanPath = pacmanPath;
@@ -203,6 +211,11 @@ public class Board extends JPanel implements ActionListener {
         g.setColor(new Color(96, 128, 255));
         s = "Time: " + calcTime + "ms";
         g.drawString(s, SCREEN_SIZE / 2 + 96, SCREEN_SIZE + 16);
+        s = "Moves: " + moves;
+        g.drawString(s, SCREEN_SIZE / 2, SCREEN_SIZE + 16);
+        s = "Memory spent: " + operMem;
+        g.drawString(s, SCREEN_SIZE , SCREEN_SIZE + 16);
+
         //g.drawString(s, SCREEN_SIZE / 2 , SCREEN_SIZE + 16);
 
 //        for (i = 0; i < pacsLeft; i++) {
@@ -378,53 +391,53 @@ public class Board extends JPanel implements ActionListener {
         pacman_y = pacman_y + PACMAN_SPEED * pacmand_y;
     }
 
-    private void movePacman() {
-
-        int pos;
-        short ch;
-
-        if (req_dx == -pacmand_x && req_dy == -pacmand_y) {
-            pacmand_x = req_dx;
-            pacmand_y = req_dy;
-            view_dx = pacmand_x;
-            view_dy = pacmand_y;
-        }
-
-        if (pacman_x % BLOCK_SIZE == 0 && pacman_y % BLOCK_SIZE == 0) {
-            pos = pacman_x / BLOCK_SIZE + N_BLOCKS * (int) (pacman_y / BLOCK_SIZE);
-            ch = screenData[pos];
-
-            //проверяет сьел ли конфетку и обнуляет значение
-            if ((ch & 16) != 0) {
-                screenData [pos] = (short) (ch & 15);
-                score++;
-            }
-
-            if (req_dx != 0 || req_dy != 0) {
-                if (!((req_dx == -1 && req_dy == 0 && (ch & 1) != 0)
-                        || (req_dx == 1 && req_dy == 0 && (ch & 4) != 0)
-                        || (req_dx == 0 && req_dy == -1 && (ch & 2) != 0)
-                        || (req_dx == 0 && req_dy == 1 && (ch & 8) != 0))) {
-                    pacmand_x = req_dx;
-                    pacmand_y = req_dy;
-                    view_dx = pacmand_x;
-                    view_dy = pacmand_y;
-                }
-            }
-
-            // Check for standstill
-            if ((pacmand_x == -1 && pacmand_y == 0 && (ch & 1) != 0)
-                    || (pacmand_x == 1 && pacmand_y == 0 && (ch & 4) != 0)
-                    || (pacmand_x == 0 && pacmand_y == -1 && (ch & 2) != 0)
-                    || (pacmand_x == 0 && pacmand_y == 1 && (ch & 8) != 0)) {
-                System.out.println("СТЕНА");
-                pacmand_x = 0;
-                pacmand_y = 0;
-            }
-        }
-        pacman_x = pacman_x + PACMAN_SPEED * pacmand_x;
-        pacman_y = pacman_y + PACMAN_SPEED * pacmand_y;
-    }
+//    private void movePacman() {
+//
+//        int pos;
+//        short ch;
+//
+//        if (req_dx == -pacmand_x && req_dy == -pacmand_y) {
+//            pacmand_x = req_dx;
+//            pacmand_y = req_dy;
+//            view_dx = pacmand_x;
+//            view_dy = pacmand_y;
+//        }
+//
+//        if (pacman_x % BLOCK_SIZE == 0 && pacman_y % BLOCK_SIZE == 0) {
+//            pos = pacman_x / BLOCK_SIZE + N_BLOCKS * (int) (pacman_y / BLOCK_SIZE);
+//            ch = screenData[pos];
+//
+//            //проверяет сьел ли конфетку и обнуляет значение
+//            if ((ch & 16) != 0) {
+//                screenData [pos] = (short) (ch & 15);
+//                score++;
+//            }
+//
+//            if (req_dx != 0 || req_dy != 0) {
+//                if (!((req_dx == -1 && req_dy == 0 && (ch & 1) != 0)
+//                        || (req_dx == 1 && req_dy == 0 && (ch & 4) != 0)
+//                        || (req_dx == 0 && req_dy == -1 && (ch & 2) != 0)
+//                        || (req_dx == 0 && req_dy == 1 && (ch & 8) != 0))) {
+//                    pacmand_x = req_dx;
+//                    pacmand_y = req_dy;
+//                    view_dx = pacmand_x;
+//                    view_dy = pacmand_y;
+//                }
+//            }
+//
+//            // Check for standstill
+//            if ((pacmand_x == -1 && pacmand_y == 0 && (ch & 1) != 0)
+//                    || (pacmand_x == 1 && pacmand_y == 0 && (ch & 4) != 0)
+//                    || (pacmand_x == 0 && pacmand_y == -1 && (ch & 2) != 0)
+//                    || (pacmand_x == 0 && pacmand_y == 1 && (ch & 8) != 0)) {
+//                System.out.println("СТЕНА");
+//                pacmand_x = 0;
+//                pacmand_y = 0;
+//            }
+//        }
+//        pacman_x = pacman_x + PACMAN_SPEED * pacmand_x;
+//        pacman_y = pacman_y + PACMAN_SPEED * pacmand_y;
+//    }
 
     private void drawPacman(Graphics2D g2d) {
 
@@ -568,14 +581,14 @@ public class Board extends JPanel implements ActionListener {
             screenData[i] = levelData[i];
         }
 
-        continueLevel();
-    }
+        //continueLevel();
+    //}
 
-    private void continueLevel() {
-
-        short i;
-        int dx = 1;
-        int random;
+//    private void continueLevel() {
+//
+//        short i;
+//        int dx = 1;
+//        int random;
 
 //        for (i = 0; i < N_GHOSTS; i++) {
 //
@@ -704,7 +717,6 @@ public class Board extends JPanel implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-
         repaint();
     }
 }
