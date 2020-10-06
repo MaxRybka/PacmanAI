@@ -8,12 +8,12 @@ public class PacmanAgent implements Agent {
     private Pair start_pair;
     private Board board;
     private int counter;
-    private ArrayList<Long> mem;
-
+    private long start_mem;
 
     private long startCalcTime;
 
     public PacmanAgent(Pair start_pair,Board board) {
+        this.start_mem = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
         this.board = board;
         this.start_pair = start_pair;
         frontier.add(start_pair);
@@ -31,8 +31,8 @@ public class PacmanAgent implements Agent {
             }
             if (frontier.isEmpty())return null;
         }
-        System.out.println("Frontier size : " + frontier.size()
-        + "\nVisited size : " + visited.size());
+//        System.out.println("Frontier size : " + frontier.size()
+//        + "\nVisited size : " + visited.size());
         return findBackPath(frontier.peek());
     }
 
@@ -40,32 +40,27 @@ public class PacmanAgent implements Agent {
         Stack<Pair> result = new Stack<>();
         result.add(pair);
         Pair currPair = pair;
-        System.out.println(currPair.toString());
+        //System.out.println(currPair.toString());
         while(!currPair.equals(start_pair)){
             currPair = currPair.getParent();
             result.add(currPair);
-            System.out.println(currPair.toString());
+            //System.out.println(currPair.toString());
         }
 
-        //set calculation time
-        System.out.println(counter);
-        //System.out.println(Collections.max(mem));
+        //calculate and set spent operation memory
+        Long current_mem = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+        board.SetOperMem((start_mem-current_mem)/1024);
+
+        //set moves
         board.SetMoves(counter);
+
+        //set calculation time
         board.SetCalcTime(System.currentTimeMillis() - startCalcTime);
         return result;
     }
 
     @Override
     public ArrayList<Pair> successor(Pair pos) {
-
-        //add memory needed at that moment
-        Runtime runtime = Runtime.getRuntime();
-        long memoryMax = runtime.maxMemory();
-        System.out.println(memoryMax);
-        Long mem1=memoryMax - runtime.freeMemory();
-        //mem.add(mem1);
-        System.out.println("memory spent:"+mem1);
-        //mem.add(mem1);
         //count moves
         counter++;
         ArrayList<Pair> result = new ArrayList<Pair>();
@@ -77,17 +72,14 @@ public class PacmanAgent implements Agent {
         if((ch & 4) == 0){
             Pair newPair = new Pair(pos.getX()+1,pos.getY(),pos);
             if (!visited.contains(newPair))result.add(newPair);
-            //result.add(board.getDPair(pos,1,0));
         }
         if((ch & 2) == 0){
             Pair newPair = new Pair(pos.getX(),pos.getY()-1,pos);
             if (!visited.contains(newPair))result.add(newPair);
-            //result.add(board.getDPair(pos,0,-1));
         }
         if((ch & 8) == 0){
             Pair newPair = new Pair(pos.getX(),pos.getY()+1,pos);
             if (!visited.contains(newPair))result.add(newPair);
-            //result.add(board.getDPair(pos,0,1));
         }
         return result;
     }

@@ -4,7 +4,6 @@ class Pair {
     private int x;
     private int y;
 
-
     public Pair( int x, int y,Pair parent) {
         this.parent = parent;
         this.x = x;

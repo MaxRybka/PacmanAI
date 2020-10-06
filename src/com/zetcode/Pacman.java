@@ -8,25 +8,21 @@ public class Pacman extends JFrame {
     private Board board;
     private Agent agent;
     public Pacman() {
-        board= new Board();
+        board= new Board(new Pair(0,17,null));
         initUI();
-        agent=new PacmanAgent(new Pair(9,17,null),board);
+        agent=new PacmanAgent(new Pair(0,17,null),board);
     }
 
     private void initUI() {
-
         add(board);
-
         setTitle("Pacman");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(471, 532);
+        setSize(471, 520);
         setLocationRelativeTo(null);
     }
 
     public static void main(String[] args) {
-
         EventQueue.invokeLater(() -> {
-
             Pacman ex = new Pacman();
             ex.setVisible(true);
             ex.board.SetPacmanPath(ex.agent.startAgent());
