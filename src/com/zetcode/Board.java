@@ -47,6 +47,9 @@ public class Board extends JPanel implements ActionListener {
     private int[] dx, dy;
     //private int[] ghost_x, ghost_y, ghost_dx, ghost_dy, ghostSpeed;
 
+    //Stats
+    private long calcTime;
+
     //private Image ghost;
     private Image pacman1, pacman2up, pacman2left, pacman2right, pacman2down;
     private Image pacman3up, pacman3down, pacman3left, pacman3right;
@@ -71,11 +74,11 @@ public class Board extends JPanel implements ActionListener {
              5,  0,  0,  0,  5,  0,  5,  0,  0,  0,  0,  0,  5,  0,  5,  0,  0,  0,  5,
              5,  0,  0,  0,  5,  0,  5,  0,  0,  0,  0,  0,  5,  0,  5,  0,  0,  0,  5,
              9, 10, 10, 10,  4,  0,  9, 10,  6,  0,  3, 10, 12,  0,  1, 10, 10, 10, 12,
-             0,  0,  0,  0,  5,  0,  0,  0,  5,  0,  5,  0,  0,  0,  5,  0,  0,  0,  0,
+             0,  0,  0,  0, 21,  0,  0,  0,  5,  0,  5,  0,  0,  0,  5,  0,  0,  0,  0,
              0,  0,  0,  0,  5,  0,  3, 10,  8, 10,  8, 10,  6,  0,  5,  0,  0,  0,  0,
              0,  0,  0,  0,  5,  0,  5,  0,  0,  0,  0,  0,  5,  0,  5,  0,  0,  0,  0,
             11, 10, 10, 10,  0, 10,  4,  0,  0,  0,  0,  0,  1, 10,  0, 10, 10, 10, 14,
-             0,  0,  0,  0, 21,  0,  5,  0,  0,  0,  0,  0,  5,  0,  5,  0,  0,  0,  0,
+             0,  0,  0,  0,  5,  0,  5,  0,  0,  0,  0,  0,  5,  0,  5,  0,  0,  0,  0,
              0,  0,  0,  0,  5,  0,  1, 10, 10, 10, 10, 10,  4,  0,  5,  0,  0,  0,  0,
              0,  0,  0,  0,  5,  0,  5,  0,  0,  0,  0,  0,  5,  0,  5,  0,  0,  0,  0,
              3, 10, 10, 10,  0, 10,  8, 10,  6,  0,  3, 10,  8, 10,  0, 10, 10, 10,  6,
@@ -123,6 +126,11 @@ public class Board extends JPanel implements ActionListener {
         timer = new Timer(40, this);
         timer.start();
     }
+
+    public void SetCalcTime(long calcTime){
+        this.calcTime = calcTime;
+    }
+
 
     @Override
     public void addNotify() {
@@ -176,16 +184,16 @@ public class Board extends JPanel implements ActionListener {
         g2d.drawString(s, (SCREEN_SIZE - metr.stringWidth(s)) / 2, SCREEN_SIZE / 2);
     }
 
-    private void drawScore(Graphics2D g) {
+    private void drawStats(Graphics2D g) {
 
         int i;
         String s;
 
         g.setFont(smallFont);
         g.setColor(new Color(96, 128, 255));
-        s = "Time: " + score;
+        s = "Time: " + calcTime + "ms";
         g.drawString(s, SCREEN_SIZE / 2 + 96, SCREEN_SIZE + 16);
-        g.drawString(s, SCREEN_SIZE / 2 , SCREEN_SIZE + 16);
+        //g.drawString(s, SCREEN_SIZE / 2 , SCREEN_SIZE + 16);
 
 //        for (i = 0; i < pacsLeft; i++) {
 //            g.drawImage(pacman3left, i * 28 + 8, SCREEN_SIZE + 1, this);
@@ -575,7 +583,7 @@ public class Board extends JPanel implements ActionListener {
         g2d.fillRect(0, 0, d.width, d.height);
 
         drawMaze(g2d);
-        drawScore(g2d);
+        drawStats(g2d);
         doAnim();
 
         if (inGame) {
@@ -596,34 +604,34 @@ public class Board extends JPanel implements ActionListener {
 
             int key = e.getKeyCode();
 
-            if (inGame) {
-                if (key == KeyEvent.VK_LEFT) {
-                    req_dx = -1;
-                    req_dy = 0;
-                } else if (key == KeyEvent.VK_RIGHT) {
-                    req_dx = 1;
-                    req_dy = 0;
-                } else if (key == KeyEvent.VK_UP) {
-                    req_dx = 0;
-                    req_dy = -1;
-                } else if (key == KeyEvent.VK_DOWN) {
-                    req_dx = 0;
-                    req_dy = 1;
-                } else if (key == KeyEvent.VK_ESCAPE && timer.isRunning()) {
-                    inGame = false;
-                } else if (key == KeyEvent.VK_PAUSE) {
-                    if (timer.isRunning()) {
-                        timer.stop();
-                    } else {
-                        timer.start();
-                    }
-                }
-            } else {
+//            if (inGame) {
+//                if (key == KeyEvent.VK_LEFT) {
+//                    req_dx = -1;
+//                    req_dy = 0;
+//                } else if (key == KeyEvent.VK_RIGHT) {
+//                    req_dx = 1;
+//                    req_dy = 0;
+//                } else if (key == KeyEvent.VK_UP) {
+//                    req_dx = 0;
+//                    req_dy = -1;
+//                } else if (key == KeyEvent.VK_DOWN) {
+//                    req_dx = 0;
+//                    req_dy = 1;
+//                } else if (key == KeyEvent.VK_ESCAPE && timer.isRunning()) {
+//                    inGame = false;
+//                } else if (key == KeyEvent.VK_PAUSE) {
+//                    if (timer.isRunning()) {
+//                        timer.stop();
+//                    } else {
+//                        timer.start();
+//                    }
+//                }
+//            } else {
                 if (key == 's' || key == 'S') {
                     inGame = true;
                     initGame();
                 }
-            }
+            //}
         }
 
         @Override

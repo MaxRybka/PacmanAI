@@ -43,7 +43,6 @@ class Pair {
     @Override
     public String toString() {
         return "Pair{" +
-                "parent=" + parent +
                 ", x=" + x +
                 ", y=" + y +
                 '}';
