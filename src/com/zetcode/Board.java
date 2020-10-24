@@ -57,33 +57,39 @@ public class Board extends JPanel implements ActionListener {
     private Stack<Pair> c_path;
 
     private final short levelData[] = {
-             3, 10, 10, 10,  2, 10, 10, 10,  6,  0,  3, 10, 10, 10,  2, 10, 10, 10, 22,
-             5,  0,  0,  0,  5,  0,  0,  0,  5,  0,  5,  0,  0,  0,  5,  0,  0,  0,  5,
-             5,  0,  0,  0,  5,  0,  0,  0,  5,  0,  5,  0,  0,  0,  5,  0,  0,  0,  5,
-             5,  0,  0,  0,  5,  0,  0,  0,  5,  0,  5,  0,  0,  0,  5,  0,  0,  0,  5,
-             1, 10, 10, 10,  0, 10,  2, 10,  8, 10,  8, 10,  2, 10,  0, 10, 10, 10,  4,
-             5,  0,  0,  0,  5,  0,  5,  0,  0,  0,  0,  0,  5,  0,  5,  0,  0,  0,  5,
-             5,  0,  0,  0,  5,  0,  5,  0,  0,  0,  0,  0,  5,  0,  5,  0,  0,  0,  5,
-             9, 10, 10, 10,  4,  0,  9, 10,  6,  0,  3, 10, 12,  0,  1, 10, 10, 10, 12,
-             0,  0,  0,  0,  5,  0,  0,  0,  5,  0,  5,  0,  0,  0,  5,  0,  0,  0,  0,
-             0,  0,  0,  0,  5,  0,  3, 10,  8, 10,  8, 10,  6,  0,  5,  0,  0,  0,  0,
-             0,  0,  0,  0,  5,  0,  5,  0,  0,  0,  0,  0,  5,  0,  5,  0,  0,  0,  0,
-            11, 10, 10, 10,  0, 10,  4,  0,  0,  0,  0,  0,  1, 10,  0, 10, 10, 10, 14,
-             0,  0,  0,  0,  5,  0,  5,  0,  0,  0,  0,  0,  5,  0,  5,  0,  0,  0,  0,
-             0,  0,  0,  0,  5,  0,  1, 10, 10, 10, 10, 10,  4,  0,  5,  0,  0,  0,  0,
-             0,  0,  0,  0,  5,  0,  5,  0,  0,  0,  0,  0,  5,  0,  5,  0,  0,  0,  0,
-             3, 10, 10, 10,  0, 10,  8, 10,  6,  0,  3, 10,  8, 10,  0, 10, 10, 10,  6,
-             5,  0,  0,  0,  5,  0,  0,  0,  5,  0,  5,  0,  0,  0,  5,  0,  0,  0,  5,
-             9, 10,  6,  0,  1, 10,  2, 10,  8, 10,  8, 10,  2, 10,  4,  0,  3, 10, 12, //
-             0,  0, 13,  0, 13,  0, 13,  0,  0,  0,  0,  0, 13,  0, 13,  0, 13,  0,  0
+            3, 10, 10, 10, 2, 10, 10, 10, 6, 0, 3, 10, 10, 10, 2, 10, 10, 10, 6,
+            5, 0, 0, 0, 5, 0, 0, 0, 5, 0, 5, 0, 0, 0, 5, 0, 0, 0, 5,
+            5, 0, 0, 0, 5, 0, 0, 0, 5, 0, 5, 0, 0, 0, 5, 0, 0, 0, 5,
+            5, 0, 0, 0, 5, 0, 0, 0, 5, 0, 5, 0, 0, 0, 5, 0, 0, 0, 5,
+            1, 10, 10, 10, 0, 10, 2, 10, 8, 10, 8, 10, 2, 10, 0, 10, 10, 10, 4,
+            5, 0, 0, 0, 5, 0, 5, 0, 0, 0, 0, 0, 5, 0, 5, 0, 0, 0, 5,
+            5, 0, 0, 0, 5, 0, 5, 0, 0, 0, 0, 0, 5, 0, 5, 0, 0, 0, 5,
+            9, 10, 10, 10, 4, 0, 9, 10, 6, 0, 3, 10, 12, 0, 1, 10, 10, 10, 12,
+            0, 0, 0, 0, 5, 0, 0, 0, 5, 0, 5, 0, 0, 0, 5, 0, 0, 0, 0,
+            0, 0, 0, 0, 5, 0, 3, 10, 8, 10, 8, 10, 6, 0, 5, 0, 0, 0, 0,
+            0, 0, 0, 0, 5, 0, 5, 0, 0, 0, 0, 0, 5, 0, 5, 0, 0, 0, 0,
+            11, 10, 10, 10, 0, 10, 4, 0, 0, 0, 0, 0, 1, 10, 0, 10, 10, 10, 14,
+            0, 0, 0, 0, 5, 0, 5, 0, 0, 0, 0, 0, 5, 0, 5, 0, 0, 0, 0,
+            0, 0, 0, 0, 5, 0, 1, 10, 10, 10, 10, 10, 4, 0, 5, 0, 0, 0, 0,
+            0, 0, 0, 0, 5, 0, 5, 0, 0, 0, 0, 0, 5, 0, 5, 0, 0, 0, 0,
+            3, 10, 10, 10, 0, 10, 8, 10, 6, 0, 3, 10, 8, 10, 0, 10, 10, 10, 6,
+            5, 0, 0, 0, 5, 0, 0, 0, 5, 0, 5, 0, 0, 0, 5, 0, 0, 0, 5,
+            9, 10, 6, 0, 1, 10, 2, 10, 8, 10, 8, 10, 2, 10, 4, 0, 3, 10, 12,
+            0, 0, 13, 0, 13, 0, 13, 0, 0, 0, 0, 0, 13, 0, 13, 0, 13, 0, 0
     };
+
+    private Pair target;
+
+    public Pair getTarget() {
+        return target;
+    }
 
     private short[] screenData;
     private Timer timer;
 
-    public Board(Pair start_pair) {
+    public Board(Pair start_pair, Pair end_pair) {
         loadImages();
-        initVariables(start_pair);
+        initVariables(start_pair, end_pair);
         initBoard();
     }
 
@@ -96,9 +102,12 @@ public class Board extends JPanel implements ActionListener {
         setBackground(Color.black);
     }
 
-    private void initVariables(Pair start_pair) {
-        pacman_x = start_pair.getX()* BLOCK_SIZE;
+    private void initVariables(Pair start_pair, Pair end_pair) {
+        pacman_x = start_pair.getX() * BLOCK_SIZE;
         pacman_y = start_pair.getY() * BLOCK_SIZE;
+        target = end_pair;
+        levelData[target.getX() + N_BLOCKS * target.getY()] += 16;
+
         screenData = new short[N_BLOCKS * N_BLOCKS];
         mazeColor = new Color(5, 100, 5);
         d = new Dimension(400, 400);
@@ -106,20 +115,21 @@ public class Board extends JPanel implements ActionListener {
         timer.start();
     }
 
-    public void SetCalcTime(long calcTime){
+    public void SetCalcTime(long calcTime) {
         this.calcTime = calcTime;
     }
-    public void SetMoves(int moves){
+
+    public void SetMoves(int moves) {
         this.moves = moves;
     }
-    public void SetOperMem(long operMem){
+
+    public void SetOperMem(long operMem) {
         this.operMem = operMem;
     }
 
-    public void SetPacmanPath(Stack<Pair> pacmanPath){
+    public void SetPacmanPath(Stack<Pair> pacmanPath) {
         this.pacmanPath = pacmanPath;
     }
-
 
     @Override
     public void addNotify() {
@@ -143,8 +153,8 @@ public class Board extends JPanel implements ActionListener {
     }
 
     private void playGame(Graphics2D g2d) {
-            movePacmanOnPath();
-            drawPacman(g2d);
+        movePacmanOnPath();
+        drawPacman(g2d);
     }
 
     private void showIntroScreen(Graphics2D g2d) {
@@ -173,27 +183,27 @@ public class Board extends JPanel implements ActionListener {
         g.drawString(s, SCREEN_SIZE / 2 + 96, SCREEN_SIZE + 16);
         s = "Moves: " + moves;
         g.drawString(s, SCREEN_SIZE / 2 - 12, SCREEN_SIZE + 16);
-        s = "Memory spent: " + operMem +"b";
+        s = "Memory spent: " + operMem + "b";
         g.drawString(s, 48, SCREEN_SIZE + 16);
 
     }
 
-
-    public boolean isEnd(Pair pair){
-        return (screenData[pair.getX()  + N_BLOCKS * (int) pair.getY()] & 16) != 0;
+    public boolean isEnd(Pair pair) {
+        return (screenData[pair.getX() + N_BLOCKS * (int) pair.getY()] & 16) != 0;
     }
-    public short getCh(Pair pair){
-        return screenData[ pair.getX()+ N_BLOCKS * (int) pair.getY()];
+
+    public short getCh(Pair pair) {
+        return screenData[pair.getX() + N_BLOCKS * (int) pair.getY()];
     }
 
     private void movePacmanOnPath() {
 
-        if(c_path.isEmpty()){
+        if (c_path.isEmpty()) {
             //end program
             return;
         }
 
-        if(pacman_x % BLOCK_SIZE ==0 && pacman_y % BLOCK_SIZE ==0) {
+        if (pacman_x % BLOCK_SIZE == 0 && pacman_y % BLOCK_SIZE == 0) {
             int x = pacman_x / BLOCK_SIZE;
             int y = pacman_y / BLOCK_SIZE;
             int pos = x + N_BLOCKS * (int) y;
@@ -206,7 +216,7 @@ public class Board extends JPanel implements ActionListener {
 
                 c_path.pop();
 
-                if(c_path.isEmpty()){
+                if (c_path.isEmpty()) {
 
                     //end program
                     return;
@@ -403,7 +413,7 @@ public class Board extends JPanel implements ActionListener {
             showIntroScreen(g2d);
         }
 
-       // g2d.drawImage(ii, 5, 5, this);
+        // g2d.drawImage(ii, 5, 5, this);
         Toolkit.getDefaultToolkit().sync();
         g2d.dispose();
     }

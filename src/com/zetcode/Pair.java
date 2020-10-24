@@ -1,13 +1,26 @@
 package com.zetcode;
+
+import java.util.Comparator;
+
+import static java.lang.Math.abs;
+
 class Pair {
     Pair parent;
     private int x;
     private int y;
 
+    private int cost = 0;
+
     public Pair( int x, int y,Pair parent) {
         this.parent = parent;
         this.x = x;
         this.y = y;
+
+        Pair parrent_pair = parent;
+        while(parrent_pair != null){
+            cost++;
+            parrent_pair = parrent_pair.parent;
+        }
     }
 
     public int getX() {
@@ -34,6 +47,8 @@ class Pair {
         this.parent = parent;
     }
 
+    public int getCost() { return cost; }
+
     @Override
     public boolean equals(Object obj) {
         // If the object is compared with itself then return true
@@ -59,5 +74,39 @@ class Pair {
                 ", x=" + x +
                 ", y=" + y +
                 '}';
+    }
+}
+
+class HeuristicPairComparator implements Comparator<Pair>{
+
+    private Pair target;
+
+    public HeuristicPairComparator(Pair target) {
+        this.target = target;
+    }
+
+    @Override
+    public int compare(Pair o1, Pair o2) {
+        int firstD = abs(target.getX() - o1.getX()) + abs(target.getY() - o1.getY());
+        int secondD = abs(target.getX() - o2.getX()) + abs(target.getY() - o2.getY());
+
+        return firstD - secondD;
+    }
+}
+
+class APairComparator implements Comparator<Pair>{
+
+    private Pair target;
+
+    public APairComparator(Pair target) {
+        this.target = target;
+    }
+
+    @Override
+    public int compare(Pair o1, Pair o2) {
+        int firstD = abs(target.getX() - o1.getX()) + abs(target.getY() - o1.getY()) + o1.getCost();
+        int secondD = abs(target.getX() - o2.getX()) + abs(target.getY() - o2.getY()) + o2.getCost();
+
+        return firstD - secondD;
     }
 }
