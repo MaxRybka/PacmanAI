@@ -13,6 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.Stack;
 
 import javax.swing.ImageIcon;
@@ -36,6 +37,16 @@ public class Board extends JPanel implements ActionListener {
     private final int PACMAN_ANIM_COUNT = 4;
     private final int PACMAN_SPEED = 6;
 
+    private final int N_GHOSTS = 3;
+
+    public ArrayList<Pair> getGhostPositions() {
+        return ghostPositions;
+    }
+
+    private ArrayList<Pair> ghostPositions;
+    private int[] ghost_dx, ghost_dy, dx, dy;
+
+
     private int pacAnimCount = PAC_ANIM_DELAY;
     private int pacAnimDir = 1;
     private int pacmanAnimPos = 0;
@@ -49,6 +60,7 @@ public class Board extends JPanel implements ActionListener {
     private Image pacman1, pacman2up, pacman2left, pacman2right, pacman2down;
     private Image pacman3up, pacman3down, pacman3left, pacman3right;
     private Image pacman4up, pacman4down, pacman4left, pacman4right;
+    private Image ghost;
 
     private int pacman_x, pacman_y, pacmand_x, pacmand_y;
     private int view_dx, view_dy;
@@ -56,8 +68,10 @@ public class Board extends JPanel implements ActionListener {
     private Stack<Pair> pacmanPath;
     private Stack<Pair> c_path;
 
+
+
     private final short levelData[] = {
-            3, 10, 10, 10, 2, 10, 10, 10, 6, 0, 3, 10, 10, 10, 2, 10, 10, 10, 6,
+            3, 10, 10, 10, 2, 10, 10, 10, 6, 0, 3, 10, 10, 10, 2, 10, 26, 10, 6,
             5, 0, 0, 0, 5, 0, 0, 0, 5, 0, 5, 0, 0, 0, 5, 0, 0, 0, 5,
             5, 0, 0, 0, 5, 0, 0, 0, 5, 0, 5, 0, 0, 0, 5, 0, 0, 0, 5,
             5, 0, 0, 0, 5, 0, 0, 0, 5, 0, 5, 0, 0, 0, 5, 0, 0, 0, 5,
@@ -87,9 +101,9 @@ public class Board extends JPanel implements ActionListener {
     private short[] screenData;
     private Timer timer;
 
-    public Board(Pair start_pair, Pair end_pair) {
+    public Board(Pair start_pair) {
         loadImages();
-        initVariables(start_pair, end_pair);
+        initVariables(start_pair);
         initBoard();
     }
 
@@ -102,11 +116,12 @@ public class Board extends JPanel implements ActionListener {
         setBackground(Color.black);
     }
 
-    private void initVariables(Pair start_pair, Pair end_pair) {
+    private void initVariables(Pair start_pair) {
         pacman_x = start_pair.getX() * BLOCK_SIZE;
         pacman_y = start_pair.getY() * BLOCK_SIZE;
-        target = end_pair;
-        levelData[target.getX() + N_BLOCKS * target.getY()] += 16;
+
+        dx = new int[4];
+        dy = new int[4];
 
         screenData = new short[N_BLOCKS * N_BLOCKS];
         mazeColor = new Color(5, 100, 5);
@@ -239,7 +254,7 @@ public class Board extends JPanel implements ActionListener {
     private void drawPacman(Graphics2D g2d) {
 
         if (view_dx == -1) {
-            drawPacnanLeft(g2d);
+            drawPacmanLeft(g2d);
         } else if (view_dx == 1) {
             drawPacmanRight(g2d);
         } else if (view_dy == -1) {
@@ -285,7 +300,7 @@ public class Board extends JPanel implements ActionListener {
         }
     }
 
-    private void drawPacnanLeft(Graphics2D g2d) {
+    private void drawPacmanLeft(Graphics2D g2d) {
 
         switch (pacmanAnimPos) {
             case 1:
@@ -319,6 +334,11 @@ public class Board extends JPanel implements ActionListener {
                 g2d.drawImage(pacman1, pacman_x + 1, pacman_y + 1, this);
                 break;
         }
+    }
+
+    private void drawGhost(Graphics2D g2d, int x, int y) {
+
+        g2d.drawImage(ghost, x, y, this);
     }
 
     private void drawMaze(Graphics2D g2d) {
@@ -387,6 +407,7 @@ public class Board extends JPanel implements ActionListener {
         pacman2right = new ImageIcon("src/resources/images/right1.png").getImage();
         pacman3right = new ImageIcon("src/resources/images/right2.png").getImage();
         pacman4right = new ImageIcon("src/resources/images/right3.png").getImage();
+        ghost = new ImageIcon("images/ghost.png").getImage();
 
     }
 

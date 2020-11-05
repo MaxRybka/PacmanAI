@@ -1,6 +1,7 @@
 package com.zetcode;
 
 import java.awt.EventQueue;
+import java.util.ArrayList;
 import javax.swing.JFrame;
 
 public class Pacman extends JFrame {
@@ -8,7 +9,7 @@ public class Pacman extends JFrame {
 
     private Agent agent;
     private Pair start_pair = new Pair(9,17,null);
-    private Board board= new Board(start_pair, new Pair(18,0,null));
+    private Board board= new Board(start_pair);
 
     public Board getBoard() {
         return board;
