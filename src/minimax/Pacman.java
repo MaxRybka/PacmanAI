@@ -14,7 +14,7 @@ public class Pacman extends JFrame {
     private void initUI() {
 
         add(new Board(new Pair(7,11,null),new ArrayList<Pair>(){{
-            add(new Pair(7,3,null));
+            add(new Pair(4,8,null));
         }}));
 
         setTitle("Pacman");

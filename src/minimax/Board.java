@@ -38,14 +38,13 @@ public class Board extends JPanel implements ActionListener {
     private final int PAC_ANIM_DELAY = 2;
     private final int PACMAN_ANIM_COUNT = 4;
     private final int MAX_GHOSTS = 12;
+    private final int MAX_DIFFICULTY_LEVEL = 3;
     private final int PACMAN_SPEED = 6;
 
     private int pacAnimCount = PAC_ANIM_DELAY;
     private int pacAnimDir = 1;
     private int pacmanAnimPos = 0;
     private int pacsLeft, score;
-    private int[] dx, dy;
-    private int[] ghost_x, ghost_y, ghost_dx, ghost_dy, ghostSpeed;
 
     private Image ghost;
     private Image pacman1, pacman2up, pacman2left, pacman2right, pacman2down;
@@ -72,31 +71,48 @@ public class Board extends JPanel implements ActionListener {
             1, 25, 24, 24, 24, 24, 24, 24, 24, 24, 16, 16, 16, 18, 20,
             9, 8, 8, 8, 8, 8, 8, 8, 8, 8, 25, 24, 24, 24, 28
     };
+    private ArrayList<Pair> targets;
 
-    private final int validSpeeds[] = {1, 2, 3, 4, 6, 8};
-    private final int maxSpeed = 6;
-
-    private ArrayList<Pair> ghostPositions;
-    public ArrayList<Pair> getGhostPositions() {
-        return ghostPositions;
+    public ArrayList<Pair> getTargets() {
+        return targets;
     }
 
-    private Pair pacmanPosition;
-    public Pair getPacmanPosition() {
-        return pacmanPosition;
+    private final int[] validSpeeds = {1, 2, 3, 4, 6, 8};
+    private int difficultyLevel = 0;
+
+    private ArrayList<Ghost> ghosts;
+
+    private Pair pacmanCurrentPosition;
+    private Pair pacmanStartPos;
+    private MinimaxPacmanAgent minimaxPacmanAgent;
+    public Pair getPacmanCurrentPosition() {
+        return pacmanCurrentPosition;
     }
 
-    private int currentSpeed = 3;
+    public ArrayList<Pair> getGhostPositions(){
+        return new ArrayList<Pair>(){{
+            for(Ghost ghost : ghosts)
+                add(ghost.getCurrentGridPosition());
+        }};
+    }
+
+    public int getNBlocks() {
+        return N_BLOCKS;
+    }
+
     private short[] screenData;
     private Timer timer;
 
-    private MinimaxAgent minimaxAgent;
-
     public Board(Pair start_pair, ArrayList<Pair> ghostPositions) {
         loadImages();
-        minimaxAgent = new MinimaxAgent(this);
+        minimaxPacmanAgent = new MinimaxPacmanAgent(this);
+        this.pacmanStartPos = start_pair;
 
-        this.ghostPositions=ghostPositions;
+        ghosts = new ArrayList<>();
+        //create ghosts
+        for (int i = 0; i < ghostPositions.size(); i++) {
+            ghosts.add(new Ghost(ghostPositions.get(i),2,new MinimaxGhostAgent(this),BLOCK_SIZE));
+        }
 
         initVariables(start_pair);
         initBoard();
@@ -117,30 +133,24 @@ public class Board extends JPanel implements ActionListener {
 
         pacman_x = start_pair.getX() * BLOCK_SIZE;
         pacman_y = start_pair.getY() * BLOCK_SIZE;
-
-        pacmanPosition = start_pair;
-
-        ghost_x = new int[ghostPositions.size()];
-        ghost_y = new int[ghostPositions.size()];
-
-        for (int i = 0; i < ghostPositions.size(); i++) {
-            ghost_x[i] = ghostPositions.get(i).getX()*BLOCK_SIZE;
-            ghost_y[i] = ghostPositions.get(i).getY()*BLOCK_SIZE;
-        }
+        pacmanCurrentPosition = start_pair;
 
         mazeColor = new Color(5, 100, 5);
         d = new Dimension(400, 400);
-        //ghost_x = new int[MAX_GHOSTS];
-        ghost_dx = new int[ghostPositions.size()];
-        //ghost_y = new int[MAX_GHOSTS];
-        ghost_dy = new int[ghostPositions.size()];
-        //ghostSpeed = new int[ghostPositions.size()];
-        dx = new int[4];
-        dy = new int[4];
 
         timer = new Timer(40, this);
         timer.start();
     }
+    
+    private void InitTargets(){
+        targets = new ArrayList<>();
+        for (int i = 0; i < screenData.length; i++) {
+            if ((screenData[i] & 16) != 0) {
+                targets.add(new Pair(i%N_BLOCKS,i/N_BLOCKS,null));
+            }
+        }
+    }
+    
 
     @Override
     public void addNotify() {
@@ -226,15 +236,7 @@ public class Board extends JPanel implements ActionListener {
         if (finished) {
 
             score += 50;
-
-//            if (N_GHOSTS < MAX_GHOSTS) {
-//                N_GHOSTS++;
-//            }
-
-            if (currentSpeed < maxSpeed) {
-                currentSpeed++;
-            }
-
+            increaseDifficulty();
             initLevel();
         }
     }
@@ -250,79 +252,44 @@ public class Board extends JPanel implements ActionListener {
         continueLevel();
     }
 
+    private void increaseDifficulty(){
+        //increase difficulty
+        if(difficultyLevel!=MAX_DIFFICULTY_LEVEL){
+            difficultyLevel++;
+            switch(difficultyLevel){
+                case 1:
+                    ghosts.add(new Ghost(new Pair(4,3,null),2,new MinimaxGhostAgent(this),BLOCK_SIZE));
+                    break;
+                case 2:
+                    ghosts.add(new Ghost(new Pair(10,3,null),2,new MinimaxGhostAgent(this),BLOCK_SIZE));
+                    break;
+                case 3:
+                    ghosts.add(new Ghost(new Pair(12,10,null),2,new MinimaxGhostAgent(this),BLOCK_SIZE));
+                    break;
+            }
+        }
+    }
+
     private void moveGhosts(Graphics2D g2d) {
 
         short i;
         int pos;
         int count;
 
-        for (i = 0; i < ghostPositions.size(); i++) {
-            if (ghost_x[i] % BLOCK_SIZE == 0 && ghost_y[i] % BLOCK_SIZE == 0) {
-                pos = ghost_x[i] / BLOCK_SIZE + N_BLOCKS * (int) (ghost_y[i] / BLOCK_SIZE);
-                //TODO: call minimax for ghosts
-
-
-                count = 0;
-
-                if ((screenData[pos] & 1) == 0 && ghost_dx[i] != 1) {
-                    dx[count] = -1;
-                    dy[count] = 0;
-                    count++;
-                }
-
-                if ((screenData[pos] & 2) == 0 && ghost_dy[i] != 1) {
-                    dx[count] = 0;
-                    dy[count] = -1;
-                    count++;
-                }
-
-                if ((screenData[pos] & 4) == 0 && ghost_dx[i] != -1) {
-                    dx[count] = 1;
-                    dy[count] = 0;
-                    count++;
-                }
-
-                if ((screenData[pos] & 8) == 0 && ghost_dy[i] != -1) {
-                    dx[count] = 0;
-                    dy[count] = 1;
-                    count++;
-                }
-
-                if (count == 0) {
-
-                    if ((screenData[pos] & 15) == 15) {
-                        ghost_dx[i] = 0;
-                        ghost_dy[i] = 0;
-                    } else {
-                        ghost_dx[i] = -ghost_dx[i];
-                        ghost_dy[i] = -ghost_dy[i];
-                    }
-
-                } else {
-
-                    count = (int) (Math.random() * count);
-
-                    if (count > 3) {
-                        count = 3;
-                    }
-
-                    ghost_dx[i] = dx[count];
-                    ghost_dy[i] = dy[count];
-                }
-
-                ghostPositions.get(i).setX(ghostPositions.get(i).getX() + ghost_dx[i]);
-                ghostPositions.get(i).setY(ghostPositions.get(i).getY() + ghost_dy[i]);
-
+        for (i = 0; i < ghosts.size(); i++) {
+            //Ghost ghost = ghosts.get(i);
+            if (ghosts.get(i).getPixelX() % BLOCK_SIZE == 0 && ghosts.get(i).getPixelY() % BLOCK_SIZE == 0) {
+                //call minimax for ghosts
+                ghosts.get(i).makeMove();
             }
 
-            ghost_x[i] = ghost_x[i] + (ghost_dx[i]*2);
-            ghost_y[i] = ghost_y[i] + (ghost_dy[i]*2);
+            ghosts.get(i).setPixelPosition(ghosts.get(i).getPixelX() + (ghosts.get(i).getDx()*ghosts.get(i).getSpeed()),ghosts.get(i).getPixelY() + (ghosts.get(i).getDy()*ghosts.get(i).getSpeed()));
 
+            drawGhost(g2d, ghosts.get(i).getPixelX() + 1, ghosts.get(i).getPixelY() + 1);
 
-            drawGhost(g2d, ghost_x[i] + 1, ghost_y[i] + 1);
-
-            if (pacman_x > (ghost_x[i] - 12) && pacman_x < (ghost_x[i] + 12)
-                    && pacman_y > (ghost_y[i] - 12) && pacman_y < (ghost_y[i] + 12)
+            //check if ghost collides with pacman
+            if (pacman_x > (ghosts.get(i).getPixelX() - 12) && pacman_x < (ghosts.get(i).getPixelX() + 12)
+                    && pacman_y > (ghosts.get(i).getPixelY() - 12) && pacman_y < (ghosts.get(i).getPixelY() + 12)
                     && inGame) {
 
                 dying = true;
@@ -345,21 +312,19 @@ public class Board extends JPanel implements ActionListener {
         }
 
         if (pacman_x % BLOCK_SIZE == 0 && pacman_y % BLOCK_SIZE == 0) {
-            pacmanPosition = minimaxAgent.MinimaxDecision(pacmanPosition);
+            pacmanCurrentPosition = minimaxPacmanAgent.MinimaxDecision(pacmanCurrentPosition);
             int x = pacman_x / BLOCK_SIZE;
             int y = pacman_y / BLOCK_SIZE;
             int pos = x + N_BLOCKS * (int) y;
 
             if ((screenData[pos] & 16) != 0) {
                 screenData[pos] = (short) (screenData[pos] & 15);
+                targets.remove(new Pair(x,y,null));
                 score++;
             }
 
-            System.out.println("Moving to : " + pacmanPosition.getX() + " " + pacmanPosition.getY());
-            //System.out.println("Pacman is on " + c_path.peek().toString() + "\nit's value : " + screenData[pos]);
-
-            pacmand_x = pacmanPosition.getX() - x;
-            pacmand_y = pacmanPosition.getY() - y;
+            pacmand_x = pacmanCurrentPosition.getX() - x;
+            pacmand_y = pacmanCurrentPosition.getY() - y;
 
             //change pacman view
             view_dx = pacmand_x;
@@ -498,7 +463,6 @@ public class Board extends JPanel implements ActionListener {
         pacsLeft = 3;
         score = 0;
         initLevel();
-        currentSpeed = 3;
     }
 
     private void initLevel() {
@@ -517,24 +481,14 @@ public class Board extends JPanel implements ActionListener {
         int dx = 1;
         int random;
 
-        for (i = 0; i < ghostPositions.size(); i++) {
+        InitTargets();
 
-            //ghost_y[i] = 4 * BLOCK_SIZE;
-            //ghost_x[i] = 4 * BLOCK_SIZE;
-            ghost_dy[i] = 0;
-            ghost_dx[i] = dx;
-            dx = -dx;
-            random = (int) (Math.random() * (currentSpeed + 1));
+        //TODO: reset ghosts positions
 
-            if (random > currentSpeed) {
-                random = currentSpeed;
-            }
+        pacman_x = pacmanStartPos.getX() * BLOCK_SIZE;
+        pacman_y = pacmanStartPos.getY() * BLOCK_SIZE;
+        pacmanCurrentPosition = pacmanStartPos;
 
-            //ghostSpeed[i] = validSpeeds[random];
-        }
-
-        pacman_x = 7 * BLOCK_SIZE;
-        pacman_y = 11 * BLOCK_SIZE;
         pacmand_x = 0;
         pacmand_y = 0;
         req_dx = 0;
@@ -593,11 +547,11 @@ public class Board extends JPanel implements ActionListener {
     }
 
     public boolean isEnd(Pair pair) {
-        return (screenData[pair.getX() + N_BLOCKS * (int) pair.getY()] & 16) != 0;
+        return (screenData[pair.getX() + N_BLOCKS * pair.getY()] & 16) != 0;
     }
 
     public short getCh(Pair pair) {
-        return screenData[pair.getX() + N_BLOCKS * (int) pair.getY()];
+        return screenData[pair.getX() + N_BLOCKS * pair.getY()];
     }
 
     class TAdapter extends KeyAdapter {
